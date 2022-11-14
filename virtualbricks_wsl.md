@@ -7,7 +7,7 @@ author: "Lorenzo Felletti"
 
 | Version | Updated | Author | Contact |
 |---|---|---|---|
-| 2.0.0 | 2022-10-26 | Lorenzo Felletti | lorenzo.felletti2@unibo.it |
+| 2.0.0 | 2022-11-15 | Lorenzo Felletti | lorenzo.felletti2@unibo.it |
 
 This is a guide to install *Virtualbricks* in *WSL2*. Virtualbricks is a frontend for the management of *Qemu* Virtual Machines (VMs) and *VDE* virtualized network devices (switches, channel emulators, etc.) used in the course of Infrastructures and Architectures for Space Networks at the University of Bologna.
 
@@ -57,10 +57,74 @@ To install Virtualbricks in Ubuntu 20.04 LTS, follow this steps:
     ```
 
 ## Creating a Control Network
-> The following steps are an adaptation of the steps from [here](http://cnrl.deis.unibo.it/control_network_en.php).
-- Download this file: [control_network.sh](https://raw.githubusercontent.com/lorenzofelletti/lorenzofelletti.github.io/master/assets/control_network.sh)
-- decompress the file using `tar jxvf vde_switch-init.tar.bz2`
+> The following steps are an adaptation of the steps described [here](http://cnrl.deis.unibo.it/control_network_en.php).
+The **vde_switch** is just a *virtual switch*. It is one of the tools provided in the *VDE* package. In Debian and Ubuntu, the packet vde2 is already installed or it can be easily installed from official repositories. As a last resort, if in your
+ditribution the packet is not included, it can be installed from the source code, by following the guide provided here
+(https://github.com/virtualsquare/vde-2).
 
+- Download this file: [control_network.sh](https://raw.githubusercontent.com/lorenzofelletti/lorenzofelletti.github.io/master/assets/control_network.sh)
+- Decompress the file using `tar jxvf vde_switch-init.tar.bz2`
+- Copy the file in a directory inside your home (e.g. `/home/USERNAME/mytdnlab`)
+  - `cp vde_switch /home/USERNAME/mydtnlab`
+  - *Note:* it is important that the directory is inside `/home/USERNAME/` (or at least `/home/`, if you really need it), otherwise the procedure does *not* work (for some reason)
+- Assign the *execution* right to the file by running `sudo chmod +x /home/USERNAME/mydtnlab/vde_switch`
+- Run `sudo useradd USERNAME kvm`.
+
+### Vde_switch Execution Automation
+At this point you have three options to handle the `vde_switch` execution:
+1. If your WSL installation supports `systemd` or `init.d`, you can automate the task directly in Ubuntu
+2. You can skip the task automation, and execute (*only once*) at every WSL reboot the following steps
+    1. `cd /home/USERNAME/mydtnlab`
+    2. `sudo ./vde_switch start`
+3. If `systemd` or `init.d` are not supported, but you still want to automate the script execution, you can follow the same steps as for the `init.d` automation, and then the additional steps to create a Windows Task to handle the rest of the automation Windows-side.
+
+> After you chose and completed one of the three options, check the network configuration by running `sudo ifconfig`
+
+#### Steps if Init.d is Supported
+1. `cd /etc/cron.d/`
+2. Create a new file named vde_for_dtn (or whatever)
+    - `sudo nano -c vde_for_dtn`
+3. Write the following lines
+    ```Text
+    SHELL=/bin/sh
+    HOME=/home/USERNAME/mydtnlab
+    PATH=/home/USERNAME/mydtnlab
+    @reboot root cd /home/USERNAME/mydtnlab && ./vde_switch start
+    ```
+4. Save and close
+5. Run `sudo update-rc.d vde_switch defaults`
+6. Run `sudo reboot now`.
+
+#### (Additional) Steps to Create a Windows Task
+> These steps should be followed **if and only if** you chose to follow the third option [here](#vde_switch-execution-automation). Do **not** follow them otherwise.
+At this point, we have created the `cron` job, but `cron` is not started automatically on WSL start if `init.d` or `systemd` are not supported by your WSL installation.
+To automate `cron` start, we have to create a Task in Windows, using the **Task Scheduler** (*Utilità di Pianificazione* in Italian)
+1. Within Windows, go to the search bar and search ***Task Scheduler***
+2. Run ***Task Scheduler*** as administrator
+3. Click ***Task Scheduler Library*** on the left and then ***Create Task...*** on the right to create a new task
+4. Use the following parameters to configure the task
+    1. Under the ***General*** tab
+        - ***Name*** the task whatever you want, like *WSL service cron start*
+        - Choose the option ***Run whether user is logged or not***
+        - Mark ***Do not store password*** and ***Run with highest privileges***
+    2. Under the ***Triggers*** tab (*Attivazione* in Italian)
+        - Click ***New...*** to add a new trigger for the task
+        - In the ***Begin the task*** dropdown select ***At startup***
+        - (*Recommended*) Within the ***Advanced settings*** check ***Delay task for 1 minute***
+    3. Under the ***Actions*** tab
+        - Click ***New...*** to add a new action for the task
+        - Pick ***Start a program*** for the action type and then enter ***C:\Windows\System32\wsl.exe*** as the program to run
+        - Set ***Add arguments (optional)*** to ***-u root service cron start***
+    4. (*For laptops only*) Click ***Conditions***
+        - Uncheck ***Start the task only if the computer is on AC power*** (*Avvia l'attività solo se il computer è alimentato da rete elettrica* in Italian)
+5. Reboot Windows
+6. Check whether `cron` is running
+    - service cron status
+7. Check whether `tap0` appears running
+    - `ip a`
+8. Run Virtualbricks
+    - `sudo virtualbricks`
+9. Enjoy!
 
 ## Importing a VB Project
 > For the updated official guide, please refer to the professor slides on [virtuale](https://virtuale.unibo.it/).
@@ -73,15 +137,53 @@ To install Virtualbricks in Ubuntu 20.04 LTS, follow this steps:
 - Decompress the image (but keep the compressed file for backup) with `tar -xvzf filename.tar.gz`
 - Import the project in VB
   - In VB, select the *file* tab, and then the *import* command (check that you want to open the project)
-  - You will be asked first to save (an optional) embedded image which is not present in our testbeds; skip this step by just pressing *Enter*
+  - You will be asked first to save (an optional) embedded image which is not present in our testbeds; skip this step by just pressing `Enter`
   - Then you must associate the name of the image used in the project with the full path of the (decompressed) image you have saved locally
 
 ## Troubleshooting
+### Virtualbricks GTK 3.0 Error
+```Bash
+sudo apt-get update
+sudo apt-get install libgtk-3-dev
+```
 
+### Windows Task Not Starting (Missing tap0 Network Interface)
+Sometimes, usually if you run WSL too fast after boot, the windows task doens't start, and so does not `cron`.
+To avoid this problem, try to wait some seconds before starting WSL after a reboot.
+
+To fix this if the problem happens:
+1. Open WSL
+2. Run `sudo service cron start`
+3. Check if `tap0` is added by running `ip a`
+
+### Gdk-Message: Error reading events from display or Broken pipe
+This error appears in a seemingly random manner.
+To solve it when it happens:
+1. open a powershell
+2. run `wsl --shutdown`
+3. then
+    1. if you have configured `cron`
+        1. `wsl -u root service cron start`
+        2. open a new Ubuntu shell
+    2. if you have *not* configured cron
+        1. open a new Ubuntu shell
+        2. `cd /home/USERNAME/mydtnlab`
+        3. `sudo ./vde_switch start`
+
+### Fixing the theme missing warning
+You could see some warning about the missing of the theme icons.
+If the missing icons are that of the yaru theme, then it's quite easy to fix this warnings:
+```Bash
+sudo apt install yaru-theme-icon
+```
+If the missing icons are relative to other themes, probably you can find a solution with some googling.
 
 ## Other useful resources
 ### Introduction to Nano
 Nano is a simple text editor that is installed by default in Ubuntu. To open a file with nano, run `nano <filename>`. To save the file, press `Ctrl+O` and then `Enter`. To exit, press `Ctrl+X`.
+
+Sometimes, you will need sudo privileges to edit some files.
+If, by error you edited a file that needed sudo to be edited and now you don't know how to exit from nano, just press `Ctrl+X`, then type `N` when asked whether you want to save or not, and finally press `Enter` to exit *without* saving.
 
 A more detailed guide can be found [here](https://www.howtogeek.com/howto/42980/the-beginners-guide-to-nano-the-linux-command-line-text-editor/).
 
