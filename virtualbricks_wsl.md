@@ -1,8 +1,3 @@
----
-layout: post
-title: "VirtualBricks in WSL2"
-author: "Lorenzo Felletti"
----
 # Virtualbricks in WSL2
 
 | Version | Updated | Author | Contact |
