@@ -129,7 +129,7 @@ To automate `cron` start, we have to create a Task in Windows, using the **Task 
   - *Tip: save it in a new directory called `VB_projects`*
 - Download the image required by the selected project (e.g. Debian 10) from here (the image is larger than 1GB) from [here](http://cnrl.deis.unibo.it/VB_images.php)
   - *Tip: save it in a new directory called `VB_images`*
-- Decompress the image (but keep the compressed file for backup) with `tar -xvzf filename.tar.gz`
+- Decompress the image (but keep the compressed file for backup) with `sudo tar -xvzf filename.tar.gz`
 - Import the project in VB
   - In VB, select the *file* tab, and then the *import* command (check that you want to open the project)
   - You will be asked first to save (an optional) embedded image which is not present in our testbeds; skip this step by just pressing `Enter`
