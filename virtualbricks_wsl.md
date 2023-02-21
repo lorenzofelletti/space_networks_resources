@@ -2,7 +2,7 @@
 
 | Version | Updated | Author | Contact |
 |---|---|---|---|
-| 2.0.1 | 2022-11-15 | Lorenzo Felletti | lorenzo.felletti2@unibo.it |
+| 2.0.2 | 2023-02-21 | Lorenzo Felletti | lorenzo.felletti2@unibo.it |
 
 This is a guide to install *Virtualbricks* in *WSL2*. Virtualbricks is a frontend for the management of *Qemu* Virtual Machines (VMs) and *VDE* virtualized network devices (switches, channel emulators, etc.) used in the course of Infrastructures and Architectures for Space Networks at the University of Bologna.
 
