@@ -63,7 +63,7 @@ ditribution the packet is not included, it can be installed from the source code
   - `cp vde_switch /home/USERNAME/mydtnlab`
   - *Note:* it is important that the directory is inside `/home/USERNAME/` (or at least `/home/`, if you really need it), otherwise the procedure does *not* work (for some reason)
 - Assign the *execution* right to the file by running `sudo chmod +x /home/USERNAME/mydtnlab/vde_switch`
-- Run `sudo useradd USERNAME kvm`.
+- Run `sudo adduser USERNAME kvm`.
 
 ### Vde_switch Execution Automation
 At this point you have three options to handle the `vde_switch` execution:
