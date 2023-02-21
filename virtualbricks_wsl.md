@@ -151,6 +151,9 @@ To fix this if the problem happens:
 2. Run `sudo service cron start`
 3. Check if `tap0` is added by running `ip a`.
 
+### Virtual switches not starting
+Try with `sudo apt-get install vde-netemu`.
+
 ### Gdk-Message: Error reading events from display or Broken pipe
 This error appears in a seemingly random manner.
 To solve it when it happens:
