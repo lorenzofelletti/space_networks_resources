@@ -2,7 +2,7 @@
 
 | Version | Updated | Author | Contact |
 |---|---|---|---|
-| 2.0.2 | 2023-02-21 | Lorenzo Felletti | lorenzo.felletti2@unibo.it |
+| 2.0.3 | 2023-02-21 | Lorenzo Felletti | lorenzo.felletti@studio.unibo.it |
 
 This is a guide to install *Virtualbricks* in *WSL2*. Virtualbricks is a frontend for the management of *Qemu* Virtual Machines (VMs) and *VDE* virtualized network devices (switches, channel emulators, etc.) used in the course of Infrastructures and Architectures for Space Networks at the University of Bologna.
 
@@ -34,22 +34,27 @@ User prerequisites:
 ## Install Virtualbricks
 > For the updated official guide, please refer to the professor slides on [virtuale](https://virtuale.unibo.it/).
 
-To install Virtualbricks in Ubuntu 20.04 LTS, follow this steps:
-1. Add following lines to your `/etc/apt/sources.list`:
+To install Virtualbricks in Ubuntu 20.04 LTS, follow these steps:
+1. Add following lines to your `/etc/apt/sources.list`
     ```Bash
     # DTN Repository
     deb http://cnrl.deis.unibo.it/repo/ focal main
     deb-src http://cnrl.deis.unibo.it/repo/ focal main
     ```
-2. Download and import the GPG Public Key for the repository, run the following comand:
+2. Download and import the GPG Public Key for the repository, run the following comand
    ```Bash
    wget -O - http://cnrl.deis.unibo.it/repo/signing_key.pub | sudo apt-key add -
    ```
-3. Update the package list and install Virtualbricks:
+3. Update the package list and install Virtualbricks
    ```Bash
     sudo apt update
+    
     sudo apt install virtualbricks
     ```
+4. If not already installed, run
+   ```Bash
+   sudo apt-get install vde2 vde-netemu
+   ```
 
 ## Creating a Control Network
 > The following steps are an adaptation of the steps described [here](http://cnrl.deis.unibo.it/control_network_en.php).
