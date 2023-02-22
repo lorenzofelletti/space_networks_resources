@@ -2,11 +2,11 @@
 
 | Version | Updated | Author | Contact |
 |---|---|---|---|
-| 2.0.3 | 2023-02-21 | Lorenzo Felletti | lorenzo.felletti@studio.unibo.it |
+| 2.1.0 | 2023-02-22 | Lorenzo Felletti | lorenzo.felletti@studio.unibo.it |
 
 This is a guide to install *Virtualbricks* in *WSL2*. Virtualbricks is a frontend for the management of *Qemu* Virtual Machines (VMs) and *VDE* virtualized network devices (switches, channel emulators, etc.) used in the course of Infrastructures and Architectures for Space Networks at the University of Bologna.
 
-In this guide I will assume that you already know what *WSL* (Windows Subsystem for Linux) is and that you have it already installed on your Windows machine.
+In this guide I will assume that you already know what *WSL* (Windows Subsystem for Linux) is and that it is already installed on your Windows machine.
 
 The following links are a useful starting point if you haven't heard of or haven't installed WSL:
  - WSL | Wikipedia https://en.wikipedia.org/wiki/Windows_Subsystem_for_Linux
@@ -41,20 +41,20 @@ To install Virtualbricks in Ubuntu 20.04 LTS, follow these steps:
     deb http://cnrl.deis.unibo.it/repo/ focal main
     deb-src http://cnrl.deis.unibo.it/repo/ focal main
     ```
-2. Download and import the GPG Public Key for the repository, run the following comand
+2. Download and import the GPG Public Key for the repository, running the following comand
    ```Bash
    wget -O - http://cnrl.deis.unibo.it/repo/signing_key.pub | sudo apt-key add -
    ```
 3. Update the package list and install Virtualbricks
    ```Bash
     sudo apt update
-    
     sudo apt install virtualbricks
     ```
-4. If not already installed, run
+4. If `vde-netemu` is not already installed, run
    ```Bash
    sudo apt-get install vde2 vde-netemu
    ```
+> For any problem, consult the [Troubleshooting](#troubleshooting) section.
 
 ## Creating a Control Network
 > The following steps are an adaptation of the steps described [here](http://cnrl.deis.unibo.it/control_network_en.php).
@@ -156,8 +156,15 @@ To fix this if the problem happens:
 2. Run `sudo service cron start`
 3. Check if `tap0` is added by running `ip a`.
 
-### Virtual switches not starting
-Try with `sudo apt-get install vde-netemu`.
+### Channel emulators not starting
+If every other brick, but the three channel emulators, are starting, then you probably have a problem with vde2.
+
+A possible resolution is to try to reinstall `vde2`, and make sure `vde-netemu` is installed.
+Try running
+```Bash
+sudo apt-get update
+sudo apt-get install -y vde2 vde-netemu
+```
 
 ### Gdk-Message: Error reading events from display or Broken pipe
 This error appears in a seemingly random manner.
